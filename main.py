@@ -4,7 +4,6 @@ def imprimir_torres(torres):
 
 def torres_de_hanoi(n):
     torres = [[] for _ in range(3)]
-
     for disco in range(n, 0, -1):
         torres[0].append(disco)
 

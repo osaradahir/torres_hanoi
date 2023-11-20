@@ -37,7 +37,8 @@ def dibujar_torres(torres, seleccionada):
         for j, disco in enumerate(torre):
             disco_ancho = 20 + disco * 20
             disco_alto = 20
-            pygame.draw.rect(ventana, VERDE, [i * 300 + 90 - (disco_ancho / 2) + 10, TORRE_Y - (j * disco_alto), disco_ancho, disco_alto])
+            # Ajustar las coordenadas de dibujo para que el disco se mueva un poco más alto en la parte de abajo
+            pygame.draw.rect(ventana, VERDE, [i * 300 + 90 - (disco_ancho / 2) + 10, TORRE_Y - (j * disco_alto) + disco_alto, disco_ancho, disco_alto])
     if seleccionada is not None:
         pygame.draw.rect(ventana, AZUL, [seleccionada * 300 + 70, TORRE_Y - 10, TORRE_ANCHO + 20, TORRE_ALTO + 20])
 
@@ -82,11 +83,9 @@ def torres_de_hanoi(n, origen, auxiliar, destino):
         pygame.time.wait(500)
         torres_de_hanoi(n - 1, auxiliar, origen, destino)
 
-# Mostrar la pregunta en la pantalla
 mostrar_mensaje("¿Cuántos discos deseas jugar? (1-10): ")
 n_discos = None
-
-# Esperar a que el usuario ingrese un número válido de discos
+numero_ingresado = ""
 while n_discos is None:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -94,14 +93,26 @@ while n_discos is None:
             sys.exit()
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_RETURN:
-                if 1 <= n_discos <= 10:
+                if 1 <= int(numero_ingresado) <= 10:
+                    n_discos = int(numero_ingresado)
                     break
                 else:
                     mostrar_mensaje("Número de discos no válido. Ingresa un número entre 1 y 10: ")
+                    numero_ingresado = ""
+            elif evento.key == pygame.K_BACKSPACE:
+                numero_ingresado = numero_ingresado[:-1]
             elif evento.key in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9, pygame.K_0]:
-                n_discos = int(pygame.key.name(evento.key))
+                numero_ingresado += pygame.key.name(evento.key)
             else:
                 mostrar_mensaje("Entrada no válida. Ingresa un número entre 1 y 10: ")
+                numero_ingresado = ""
+
+    # Dibujar el número ingresado en la ventana
+    ventana.fill(NEGRO)
+    texto_ingresado = fuente.render("Número ingresado: " + numero_ingresado, True, BLANCO)
+    ventana.blit(texto_ingresado, (ANCHO // 2 - texto_ingresado.get_width() // 2, ALTO // 2 - texto_ingresado.get_height() // 2))
+    pygame.display.flip()
+
 
 # Inicializar las torres con la cantidad de discos especificada
 torres = [[] for _ in range(3)]
